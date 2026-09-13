@@ -39,7 +39,7 @@ HL.grammarSorted = function () { return (HL.data.grammar || []).slice().sort((a,
 // ---------- Хранилище (localStorage) ----------
 HL.store = (function () {
   const KEY = "hl_state_v1";
-  const def = () => ({ srs: {}, lessons: {}, dialogues: {}, texts: {}, games: {}, streak: { last: null, count: 0, days: {} }, settings: { theme: "auto", trMode: "cyr", nikud: true }, learning: {} });
+  const def = () => ({ srs: {}, lessons: {}, dialogues: {}, texts: {}, games: {}, streak: { last: null, count: 0, days: {} }, settings: { theme: "auto", showTr: true, nikud: true }, learning: {} });
   let state;
   try { state = Object.assign(def(), JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { state = def(); }
   state.settings = Object.assign(def().settings, state.settings || {});
@@ -129,43 +129,16 @@ HL.markNav = function (path) {
   });
   document.querySelector(".nav").classList.remove("open");
 };
-// ---------- Транслитерация кириллица → латиница (английская транскрипция) ----------
-// Транслитерация в данных записана кириллицей с ударением (акут U+0301).
-// Эта функция превращает её в латинскую (английскую) транскрипцию на лету.
-HL.CYR2LAT = { "а":"a","б":"b","в":"v","г":"g","д":"d","е":"e","ё":"yo","ж":"zh","з":"z","и":"i","й":"y","к":"k","л":"l","м":"m","н":"n","о":"o","п":"p","р":"r","с":"s","т":"t","у":"u","ф":"f","х":"kh","ц":"ts","ч":"ch","ш":"sh","щ":"shch","ъ":"’","ы":"y","ь":"’","э":"e","ю":"yu","я":"ya" };
-HL.toLatin = function (cyr) {
-  if (!cyr) return cyr;
-  let out = "";
-  for (const ch of String(cyr)) {
-    const low = ch.toLowerCase();
-    if (HL.CYR2LAT[low] != null) {
-      let rep = HL.CYR2LAT[low];
-      if (ch !== low) rep = rep.charAt(0).toUpperCase() + rep.slice(1); // сохраняем заглавную
-      out += rep;
-    } else {
-      out += ch; // латиница (h), ударение (U+0301), пробелы, дефисы, пунктуация — как есть
-    }
-  }
-  return out;
-};
-
 HL.applySettings = function () {
   const s = HL.store.get().settings;
   const dark = s.theme === "dark" || (s.theme === "auto" && matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
-  const tr = s.trMode || (s.showTr === false ? "off" : "cyr"); // cyr | lat | off
-  document.body.classList.toggle("hidden-tr", tr === "off");
+  const showTr = s.showTr !== false;
+  document.body.classList.toggle("hidden-tr", !showTr);
   document.body.classList.toggle("nonikud", !s.nikud);
   const bt = document.getElementById("btn-tr");
-  if (bt) { bt.classList.toggle("on", tr !== "off"); bt.textContent = tr === "lat" ? "abc" : tr === "off" ? "—" : "абв"; bt.title = "Транслитерация: " + (tr === "cyr" ? "кириллица (нажмите → латиница)" : tr === "lat" ? "латиница (нажмите → скрыть)" : "скрыта (нажмите → кириллица)"); }
+  if (bt) { bt.classList.toggle("on", showTr); bt.textContent = "абв"; bt.title = "Транслитерация: " + (showTr ? "показана (нажмите → скрыть)" : "скрыта (нажмите → показать)"); }
   const bn = document.getElementById("btn-nikud"); if (bn) bn.classList.toggle("on", s.nikud);
-  // Транслитерация: конвертируем текст .tr между кириллицей и латиницей
-  document.querySelectorAll(".tr").forEach(el => {
-    if (el.children.length) return;
-    if (el.dataset.cyr == null) el.dataset.cyr = el.textContent;
-    const want = tr === "lat" ? HL.toLatin(el.dataset.cyr) : el.dataset.cyr;
-    if (el.textContent !== want) el.textContent = want;
-  });
   // Никуд: заменяем текст в .he через data-атрибут
   document.querySelectorAll(".he").forEach(el => {
     if (!el.dataset.full) el.dataset.full = el.textContent;
@@ -182,7 +155,7 @@ document.addEventListener("click", e => {
 window.addEventListener("hashchange", HL.dispatch);
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("btn-theme").onclick = () => { const s = HL.store.get().settings; const next = { auto: "dark", dark: "light", light: "auto" }[s.theme]; HL.store.setSetting("theme", next); HL.applySettings(); HL.toast("Тема: " + { auto: "как в системе", dark: "тёмная", light: "светлая" }[next]); };
-  document.getElementById("btn-tr").onclick = () => { const cur = HL.store.get().settings.trMode || "cyr"; const next = { cyr: "lat", lat: "off", off: "cyr" }[cur]; HL.store.setSetting("trMode", next); HL.applySettings(); HL.toast("Транслитерация: " + { cyr: "кириллицей", lat: "латиницей (english)", off: "скрыта" }[next]); };
+  document.getElementById("btn-tr").onclick = () => { HL.store.setSetting("showTr", HL.store.get().settings.showTr === false); HL.applySettings(); };
   document.getElementById("btn-nikud").onclick = () => { HL.store.setSetting("nikud", !HL.store.get().settings.nikud); HL.applySettings(); };
   document.getElementById("burger").onclick = () => document.querySelector(".nav").classList.toggle("open");
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", HL.applySettings);
