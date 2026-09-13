@@ -37,6 +37,8 @@
         <a class="card link" href="#/vocab"><div class="icon">📚</div><h3>Словарь по темам</h3><p class="meta">${words} слов A0–B2 по 27 темам с примерами, родом, корнем и заметками преподавателя.</p></a>
         <a class="card link" href="#/cards"><div class="icon">🃏</div><h3>Карточки (SRS)</h3><p class="meta">Интервальное повторение: слова всплывают ровно тогда, когда вы готовы их забыть.</p></a>
         <a class="card link" href="#/grammar"><div class="icon">📖</div><h3>Грамматика</h3><p class="meta">${lessons} уроков от алфавита до идиом: таблицы, типичные ошибки русскоязычных, упражнения. Пройдено: ${doneLessons}.</p></a>
+        <a class="card link" href="#/reference"><div class="icon">📚</div><h3>Справочник</h3><p class="meta">Род и число, «падежи», предлоги, времена глаголов и подробные правила чтения — вся система языка.</p></a>
+        <a class="card link" href="#/expressions"><div class="icon">💬</div><h3>Устойчивые выражения</h3><p class="meta">Идиомы, коллокации и разговорные обороты, которые звучат в реальной речи.</p></a>
         <a class="card link" href="#/dialogues"><div class="icon">💬</div><h3>Диалоги из жизни</h3><p class="meta">Магазин, поликлиника, банк, налоговая, аренда, ремонт компьютера и телефона, собеседование…</p></a>
         <a class="card link" href="#/texts"><div class="icon">✍️</div><h3>Тексты-образцы</h3><p class="meta">Биография, семья, квартира, работа, путешествия, еда. Шаблоны для собственного рассказа.</p></a>
         <a class="card link" href="#/mnemonics"><div class="icon">🧠</div><h3>Мнемоники</h3><p class="meta">Звуковые ассоциации, образы, истории и корни — чтобы слова запоминались с первого раза.</p></a>
